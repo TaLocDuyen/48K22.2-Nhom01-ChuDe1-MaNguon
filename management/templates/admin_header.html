@@ -1,0 +1,255 @@
+{%load static %}
+<header>
+    <div class="header">
+        <!-- Logo -->
+        <div class="header-logo">
+            <a href="/">
+                <img src="{% static 'img/nermanlg.png' %}" alt="Logo">
+            </a>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="nav-menu">
+            <a href="/" class="nav-item">TRANG CHỦ</a>
+            <div class="nav-item">
+                GIAN HÀNG <i class="fa fa-caret-down"></i>
+                <div class="dropdown-menu">
+                    {% load mptt_tags %}
+                    {% recursetree category %}
+                    <div class="dropdown-item">
+                        <a
+                            href="/category/{{ node.id }}/{{ node.slug }}"
+                            {% if not node.is_leaf_node %}
+                            class="dropdown-toggle"
+                            data-toggle="dropdown"
+                            aria-expanded="true"
+                            {% endif %}
+                        >
+                            {{ node.title }}
+                            {% if not node.is_leaf_node %}<i class="fa fa-angle-right"></i>{% endif %}
+                        </a>
+                        {% if not node.is_leaf_node %}
+                        <div class="dropdown-menu">
+                            {% for child in node.get_children %}
+                            <a href="/category/{{ child.id }}/{{ child.slug }}">{{ child.title }}</a>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endrecursetree %}
+                </div>
+            </div>
+            <a href="/about" class="nav-item">Giới thiệu</a>
+			<a href="/contact" class="nav-item">Liên hệ</a>
+        </nav>
+
+        <!-- Header Right (Icons) -->
+        <div class="header-right">
+            <!-- Search -->
+<div class="header-right">
+    <!-- Search -->
+    <div class="header-icon">
+        <a href="#" onclick="toggleSearchBox(event)"><i class="fa fa-search"></i></a>
+    </div>
+    <form id="search-box" style="display: none; position: absolute; top: 40px; background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 5px;" method="GET" action="{% url 'search' %}">
+        <input type="text" id="search-input" name="query" placeholder="Tìm kiếm..." style="padding: 5px; border: 1px solid #ccc; border-radius: 5px;" value="{{ query }}"/>
+        <input type="hidden" name="catid" value="0">
+        <button id="search-icon" style="background: blue; color: white; border: none; padding: 5px; border-radius: 5px;" type="submit"><i class="fa fa-search"></i></button>
+    </form>
+    </div>
+
+    <script>
+        function toggleSearchBox(event) {
+            event.preventDefault(); // Prevent the default action of the anchor tag
+            const searchBox = document.getElementById('search-box');
+            if (searchBox.style.display === 'none' || searchBox.style.display === '') {
+                searchBox.style.display = 'block';
+            } else {
+                searchBox.style.display = 'none';
+            }
+        }
+    </script>
+
+            <!-- Wishlist -->
+            <div class="header-icon">
+                <a href="#"><i class="fa fa-heart"></i><span class="qty">0</span></a>
+            </div>
+
+            <!-- Cart -->
+            <div class="header-icon">
+                <a href="/shopcart/"><i class="fa fa-shopping-cart"></i><span class="qty">0</span></a>
+            </div>
+
+            <!-- User -->
+            <div class="header-icon">
+                {% if user.is_authenticated %}
+                    <a href="/user"><i class="fa fa-user-circle"></i></a>
+                {% else %}
+                    <a href="/login"><i class="fa fa-user-circle"></i></a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</header>
+
+<style>
+    /* General reset */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+    }
+
+    /* Header styles */
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 30px;
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Logo */
+    .header-logo img {
+        max-height: 40px;
+    }
+
+    /* Navigation menu */
+    .nav-menu {
+        display: flex;
+        gap: 30px;
+    }
+
+    .nav-item {
+        position: relative;
+        text-decoration: none;
+        color: #333;
+        font-size: 16px;
+        font-weight: bold;
+        text-transform: uppercase;
+        cursor: pointer;
+    }
+
+    .nav-item:hover {
+        color: blue;
+        text-decoration: underline;
+    }
+
+    /* Dropdown menu */
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        top: 100%; /* Below the nav item */
+        left: 0;
+        background-color: #fff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        border-radius: 5px;
+        padding: 10px 0;
+        min-width: 250px;
+        z-index: 10;
+    }
+
+    .dropdown-item {
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        -webkit-transition: 0.5s all;
+        transition: 0.3s all;
+    }
+
+    .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+    .dropdown-item a {
+        text-decoration: none;
+        color: #333;
+        padding: 10px 20px;
+        display: block;
+        font-size: 14px;
+    }
+
+    .dropdown-item a:hover {
+        background-color: #f2f2f2;
+    }
+
+    .nav-item:hover .dropdown-menu {
+        display: block;
+
+    }
+
+    /* Icons */
+    .header-right {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .header-icon i {
+        font-size: 20px;
+        color: #333;
+        cursor: pointer;
+    }
+
+    .header-icon i:hover {
+        color: blue;
+    }
+
+    .qty {
+        position: absolute;
+        top: 15px;
+        right: 60px;
+        background-color: red;
+        color: white;
+        font-size: 12px;
+        padding: 2px 5px;
+        border-radius: 50%;
+    }
+
+    /* Responsive Design */
+    @media screen and (max-width: 768px) {
+        .nav-menu {
+            display: none; /* Hide nav menu for small screens */
+        }
+
+        .header {
+            flex-wrap: wrap;
+        }
+
+        .header-right {
+            justify-content: space-between;
+            width: 100%;
+        }
+    }
+    #search-box {
+        position: absolute;
+        top: 150px;
+        right: 50px;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        z-index: 1000;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    #search-input {
+        width: 250px;
+        padding: 8px;
+        margin-right: 5px;
+    }
+
+    #search-icon {
+        padding: 8px 12px;
+        background-color: blue;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+</style>
